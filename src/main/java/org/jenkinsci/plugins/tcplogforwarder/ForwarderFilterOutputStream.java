@@ -4,10 +4,14 @@ import hudson.util.ByteArrayOutputStream2;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ForwarderFilterOutputStream extends FilterOutputStream {
 
+    private static final Logger LOG = Logger.getLogger(ForwarderFilterOutputStream.class.getName());
     private static final int LF = 0x0A;
+
     private Socket socket;
     private ByteArrayOutputStream2 rawOutputStream = new ByteArrayOutputStream2(512);
     private ByteArrayOutputStream2 textOutputStream = new ByteArrayOutputStream2(512);
@@ -53,6 +57,9 @@ public class ForwarderFilterOutputStream extends FilterOutputStream {
         this.textOutputStream.write(stringBuilder.toString().getBytes());
         Utils.decodeConsoleBase64Text(this.rawOutputStream.getBuffer(), this.rawOutputStream.size(), this.textOutputStream);
 
+        final String logLine = textOutputStream.toString();
+
+        LOG.log(Level.INFO, "Writing line to TCP forwarder: " + logLine);
         this.printWriter.print(textOutputStream.toString());
         this.printWriter.flush();
         this.rawOutputStream.reset();
