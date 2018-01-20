@@ -5,6 +5,7 @@ import hudson.console.ConsoleLogFilter;
 import hudson.model.Run;
 import jenkins.YesNoMaybe;
 import org.jenkinsci.plugins.tcplogforwarder.TcpLogForwarder;
+import org.jenkinsci.plugins.tcplogforwarder.TcpLogForwarderConfiguration;
 import org.jenkinsci.plugins.workflow.steps.BodyExecutionCallback;
 import org.jenkinsci.plugins.workflow.steps.BodyInvoker;
 import org.jenkinsci.plugins.workflow.steps.Step;
@@ -15,7 +16,8 @@ import org.kohsuke.stapler.DataBoundConstructor;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
-import java.util.HashSet;
+import java.net.Socket;
+import java.util.Collections;
 import java.util.Set;
 
 public class TcpLogForwarderStep extends Step {
@@ -25,7 +27,6 @@ public class TcpLogForwarderStep extends Step {
 
     @Override
     public StepExecution start(StepContext stepContext) throws Exception {
-        System.out.println("Starting...");
         return new TcpLogForwarderStepExecution(stepContext);
     }
 
@@ -48,40 +49,41 @@ public class TcpLogForwarderStep extends Step {
         }
 
         @Override
-        public void stop(@Nonnull Throwable cause) throws Exception {
+        public void stop(@Nonnull Throwable cause) {
+            TcpLogForwarderConfiguration.get().closeSocket();
             getContext().onFailure(cause);
         }
 
         private ConsoleLogFilter createConsoleLogFilter(StepContext context)
                 throws IOException, InterruptedException {
-            ConsoleLogFilter original = context.get(ConsoleLogFilter.class);
-            Run build = context.get(Run.class);
-            ConsoleLogFilter subsequent = new TcpLogForwarder(build.getFullDisplayName());
+
+            final ConsoleLogFilter original = context.get(ConsoleLogFilter.class);
+            final Run build = context.get(Run.class);
+            final ConsoleLogFilter subsequent = new TcpLogForwarder(build.getFullDisplayName());
             return BodyInvoker.mergeConsoleLogFilters(original, subsequent);
         }
-
-
     }
 
     @Extension(dynamicLoadable = YesNoMaybe.YES, optional = true)
     public static class TcpLogForwarderStepDescriptor extends StepDescriptor {
 
+        static final String FUNCTION_NAME = "tcpForwardLog";
+        static final String DISPLAY_NAME = "Forward console log to a remote TCP endpoint";
+
         @Override
         public Set<? extends Class<?>> getRequiredContext() {
-            HashSet requiredContext = new HashSet<>();
-            requiredContext.add(Run.class);
-            return requiredContext;
+            return Collections.singleton(Run.class);
         }
 
         @Override
         public String getFunctionName() {
-            return "tcpForwardLog";
+            return FUNCTION_NAME;
         }
 
         @Nonnull
         @Override
         public String getDisplayName() {
-            return "Forward console log to a remote TCP endpoint";
+            return DISPLAY_NAME;
         }
 
         @Override

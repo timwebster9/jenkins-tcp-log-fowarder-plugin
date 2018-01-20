@@ -7,7 +7,6 @@ import hudson.model.Run;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Serializable;
-import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -20,23 +19,28 @@ public class TcpLogForwarder extends ConsoleLogFilter implements Serializable {
 
     private static final long serialVersionUID = 1L;
     private static final Logger LOG = Logger.getLogger(TcpLogForwarder.class.getName());
-    private String fullDisplayName;
+
+    private String jobDescription;
 
     /**
      * Included for backwards compatibility (required for @Extension classes)
      */
     public TcpLogForwarder() {
-
     }
 
-    public TcpLogForwarder(String fullDisplayName) {
-        this.fullDisplayName = fullDisplayName;
+    /**
+     * Called from Pipeline step
+     *
+     * @param jobDescription the job display name/number
+     */
+    public TcpLogForwarder(final String jobDescription) {
+        this.jobDescription = jobDescription;
     }
 
     @Override
-    public OutputStream decorateLogger(Run build, OutputStream logger) throws IOException {
+    public OutputStream decorateLogger(final Run build, final OutputStream logger) throws IOException {
 
-        final TcpLogForwarderConfiguration config = TcpLogForwarderConfiguration.get();
+        final TcpLogForwarderConfiguration config = getConfig();
         final boolean isEnabled = config.isEnabled();
 
         LOG.log(Level.INFO, "TCP Log Forwarder status: " + isEnabled);
@@ -45,20 +49,21 @@ public class TcpLogForwarder extends ConsoleLogFilter implements Serializable {
             return logger;
         }
 
-        final String host = config.getHost();
-        final int port = Integer.parseInt(config.getPort());
+        return new ForwarderFilterOutputStream(config.getSocket(), logger, this.getJobDescription(build));
+    }
 
-        final Socket socket = new Socket(host, port);
-        return new ForwarderFilterOutputStream(socket, logger, this.getDisplayName(build));
+    TcpLogForwarderConfiguration getConfig() {
+        return TcpLogForwarderConfiguration.get();
     }
 
     // Horrible, but can support non-pipeline builds this way
-    private String getDisplayName(Run build) {
-        if (this.fullDisplayName == null) {
+    private String getJobDescription(Run build) {
+        if (this.jobDescription == null) {
             if (build != null) {
                 return build.getFullDisplayName();
             }
         }
-        return this.fullDisplayName;
+        return this.jobDescription;
     }
+
 }

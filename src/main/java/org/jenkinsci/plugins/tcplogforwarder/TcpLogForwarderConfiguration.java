@@ -7,6 +7,10 @@ import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 
+import java.io.IOException;
+import java.io.Serializable;
+import java.net.Socket;
+
 @Extension
 public class TcpLogForwarderConfiguration extends GlobalConfiguration {
 
@@ -17,6 +21,7 @@ public class TcpLogForwarderConfiguration extends GlobalConfiguration {
     private String host;
     private String port;
     private boolean enabled;
+    private Socket socket;
 
     public TcpLogForwarderConfiguration() {
         load();
@@ -50,6 +55,25 @@ public class TcpLogForwarderConfiguration extends GlobalConfiguration {
     public void setPort(String port) {
         this.port = port;
         save();
+    }
+
+    public Socket getSocket() {
+        if (this.socket == null || this.socket.isClosed()) {
+            try {
+                this.socket = new Socket(this.host, Integer.parseInt(this.port));
+            } catch (IOException e) {
+                throw new TcpLogforwarderException(e);
+            }
+        }
+        return this.socket;
+    }
+
+    public void closeSocket() {
+        try {
+            this.socket.close();
+        } catch (IOException e) {
+            throw new TcpLogforwarderException(e);
+        }
     }
 
     public FormValidation doCheckHost(@QueryParameter String value) {
