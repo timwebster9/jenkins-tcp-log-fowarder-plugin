@@ -8,7 +8,6 @@ import java.io.DataInputStream;
 import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.Socket;
 
 public class ForwarderFilterOutputStream extends FilterOutputStream {
 
@@ -21,8 +20,6 @@ public class ForwarderFilterOutputStream extends FilterOutputStream {
     /**
      * Writes the console log to both the original logger OutputStream as well as the remote TCP socket.
      *
-     * @param socket
-     *      the remote TCP socket.  Passed in so it can be closed when the stream is closed.
      * @param logger
      *      the original console logger OutputStream
      * @param fullDisplayName
@@ -30,7 +27,7 @@ public class ForwarderFilterOutputStream extends FilterOutputStream {
      *
      * @throws IOException
      */
-    public ForwarderFilterOutputStream(Socket socket, OutputStream logger, String fullDisplayName) throws IOException {
+    public ForwarderFilterOutputStream(OutputStream logger, String fullDisplayName) {
         super(logger);
         this.fullDisplayName = fullDisplayName;
     }

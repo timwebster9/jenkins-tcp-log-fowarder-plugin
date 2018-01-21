@@ -57,25 +57,6 @@ public class TcpLogForwarderConfiguration extends GlobalConfiguration {
         save();
     }
 
-    public Socket getSocket() {
-        if (this.socket == null || this.socket.isClosed()) {
-            try {
-                this.socket = new Socket(this.host, Integer.parseInt(this.port));
-            } catch (IOException e) {
-                throw new TcpLogforwarderException(e);
-            }
-        }
-        return this.socket;
-    }
-
-    public void closeSocket() {
-        try {
-            this.socket.close();
-        } catch (IOException e) {
-            throw new TcpLogforwarderException(e);
-        }
-    }
-
     public FormValidation doCheckHost(@QueryParameter String value) {
         if (StringUtils.isEmpty(value)) {
             return FormValidation.warning("Please specify a host.");

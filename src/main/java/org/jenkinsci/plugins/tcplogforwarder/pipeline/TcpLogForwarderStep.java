@@ -5,7 +5,6 @@ import hudson.console.ConsoleLogFilter;
 import hudson.model.Run;
 import jenkins.YesNoMaybe;
 import org.jenkinsci.plugins.tcplogforwarder.TcpLogForwarder;
-import org.jenkinsci.plugins.tcplogforwarder.TcpLogForwarderConfiguration;
 import org.jenkinsci.plugins.workflow.steps.BodyExecutionCallback;
 import org.jenkinsci.plugins.workflow.steps.BodyInvoker;
 import org.jenkinsci.plugins.workflow.steps.Step;
@@ -16,7 +15,6 @@ import org.kohsuke.stapler.DataBoundConstructor;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
-import java.net.Socket;
 import java.util.Collections;
 import java.util.Set;
 
@@ -50,7 +48,6 @@ public class TcpLogForwarderStep extends Step {
 
         @Override
         public void stop(@Nonnull Throwable cause) {
-            TcpLogForwarderConfiguration.get().closeSocket();
             getContext().onFailure(cause);
         }
 

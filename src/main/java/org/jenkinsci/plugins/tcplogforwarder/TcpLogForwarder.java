@@ -45,7 +45,7 @@ public class TcpLogForwarder extends ConsoleLogFilter implements Serializable {
             return logger;
         }
 
-        return new ForwarderFilterOutputStream(config.getSocket(), logger, this.getJobDescription(build));
+        return new ForwarderFilterOutputStream(logger, this.getJobDescription(build));
     }
 
     TcpLogForwarderConfiguration getConfig() {
