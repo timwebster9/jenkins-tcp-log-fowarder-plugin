@@ -7,8 +7,6 @@ import hudson.model.Run;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Serializable;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * This class is only annotated as an Extension to support non-pipeline builds.  It is
@@ -18,7 +16,7 @@ import java.util.logging.Logger;
 public class TcpLogForwarder extends ConsoleLogFilter implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    private static final Logger LOG = Logger.getLogger(TcpLogForwarder.class.getName());
+    //private static final Logger LOG = Logger.getLogger(TcpLogForwarder.class.getName());
 
     private String jobDescription;
 
@@ -42,8 +40,6 @@ public class TcpLogForwarder extends ConsoleLogFilter implements Serializable {
 
         final TcpLogForwarderConfiguration config = getConfig();
         final boolean isEnabled = config.isEnabled();
-
-        LOG.log(Level.INFO, "TCP Log Forwarder status: " + isEnabled);
 
         if (!isEnabled) {
             return logger;

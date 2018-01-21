@@ -8,17 +8,14 @@ import java.io.DataInputStream;
 import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.net.Socket;
 
 public class ForwarderFilterOutputStream extends FilterOutputStream {
 
     private static final int LF = 0x0A;
 
-    private Socket socket;
     private ByteArrayOutputStream2 rawOutputStream = new ByteArrayOutputStream2(512);
     private ByteArrayOutputStream2 textOutputStream = new ByteArrayOutputStream2(512);
-    private PrintWriter printWriter;
     private String fullDisplayName;
 
     /**
@@ -35,9 +32,7 @@ public class ForwarderFilterOutputStream extends FilterOutputStream {
      */
     public ForwarderFilterOutputStream(Socket socket, OutputStream logger, String fullDisplayName) throws IOException {
         super(logger);
-        this.socket = socket;
         this.fullDisplayName = fullDisplayName;
-        this.printWriter = new PrintWriter(socket.getOutputStream());
     }
 
     @Override
@@ -59,7 +54,6 @@ public class ForwarderFilterOutputStream extends FilterOutputStream {
     @Override
     public void close() throws IOException {
         super.close();
-        this.printWriter.close();
         this.rawOutputStream.close();
         this.textOutputStream.close();
     }
@@ -71,8 +65,8 @@ public class ForwarderFilterOutputStream extends FilterOutputStream {
         this.textOutputStream.write(stringBuilder.toString().getBytes());
         decodeConsoleBase64Text(this.rawOutputStream.getBuffer(), this.rawOutputStream.size(), this.textOutputStream);
 
-        this.printWriter.print(textOutputStream.toString());
-        this.printWriter.flush();
+        // Send the log
+        SocketWriter.write(textOutputStream.toString());
 
         // re-use
         this.rawOutputStream.reset();
