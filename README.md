@@ -19,6 +19,9 @@ All that is required is that the plugin is enabled and configured.
 
      node {
          tcpForwardLog {
+
+             checkout scm
+
              stage('Hello') {
                  echo 'Hello World'
              }
