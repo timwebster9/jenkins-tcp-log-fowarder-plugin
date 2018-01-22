@@ -50,3 +50,17 @@ All that is required is that the plugin is enabled and configured.
             }
         }
     }
+
+## Development
+
+### Building
+To create the .hpi file, which can be installed via the Jenkins UI:
+
+    mvn clean package
+
+### Testing Locally
+To start a local Jenkins instance with the plugin installed:
+
+    mvn hpi:run
+
+Jenkins can then be reached at http://localhost:8080/jenkins/
