@@ -21,7 +21,6 @@ public class TcpLogForwarderConfiguration extends GlobalConfiguration {
     private String host;
     private String port;
     private boolean enabled;
-    private Socket socket;
 
     public TcpLogForwarderConfiguration() {
         load();
