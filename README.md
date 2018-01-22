@@ -1,6 +1,6 @@
 # Jenkins TCP Log Forwarder Plugin
 
-Generic plugin that streams Jenkins **console** logs to a remote TCP endpoint.
+##### Generic plugin that streams Jenkins _console_ logs to a remote TCP endpoint.
 
 Each line of the log will be prefixed with the job name and number, for example:
 
