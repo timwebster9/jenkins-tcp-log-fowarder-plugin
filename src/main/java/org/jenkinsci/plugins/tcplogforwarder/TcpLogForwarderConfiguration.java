@@ -68,7 +68,19 @@ public class TcpLogForwarderConfiguration extends GlobalConfiguration {
         if (StringUtils.isEmpty(value)) {
             return FormValidation.warning("Please specify a port.");
         }
+        if (isNotInteger(value)) {
+            return FormValidation.warning("Please specify an integer.");
+        }
         return FormValidation.ok();
+    }
+
+    private static boolean isNotInteger(final String value) {
+        try {
+            Integer.parseInt(value);
+            return false;
+        } catch (NumberFormatException e) {
+            return true;
+        }
     }
 
 }

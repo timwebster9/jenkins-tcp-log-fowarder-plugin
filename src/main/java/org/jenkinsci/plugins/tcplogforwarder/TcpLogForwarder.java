@@ -7,6 +7,8 @@ import hudson.model.Run;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * This class is only annotated as an Extension to support non-pipeline builds.  It is
@@ -16,7 +18,7 @@ import java.net.Socket;
 public class TcpLogForwarder extends ConsoleLogFilter implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    //private static final Logger LOG = Logger.getLogger(TcpLogForwarder.class.getName());
+    private static final Logger LOG = Logger.getLogger(TcpLogForwarder.class.getName());
 
     private String jobDescription;
 
@@ -36,7 +38,7 @@ public class TcpLogForwarder extends ConsoleLogFilter implements Serializable {
     }
 
     @Override
-    public OutputStream decorateLogger(final Run build, final OutputStream logger) throws IOException {
+    public OutputStream decorateLogger(final Run build, final OutputStream logger) {
 
         final TcpLogForwarderConfiguration config = getConfig();
         final boolean isEnabled = config.isEnabled();
@@ -47,10 +49,17 @@ public class TcpLogForwarder extends ConsoleLogFilter implements Serializable {
 
         final String host = config.getHost();
         final int port = Integer.parseInt(config.getPort());
-        final Socket socket = getSocket(host, port);
 
-        final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-        return new ForwarderFilterOutputStream(writer, logger, this.getJobDescription(build));
+        try {
+            final Socket socket = getSocket(host, port);
+            final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+            return new ForwarderFilterOutputStream(writer, logger, this.getJobDescription(build));
+        }
+        catch (final IOException e) {
+            LOG.log(Level.SEVERE, "Error!: " + e.getMessage());
+            LOG.log(Level.SEVERE, "Error establishing socket connection to [" + host + ":" + port + "].  Aborting TCP Log Forwarder.");
+            return logger;
+        }
     }
 
     @VisibleForTesting
