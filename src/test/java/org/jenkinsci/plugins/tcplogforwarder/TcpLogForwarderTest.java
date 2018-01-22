@@ -59,8 +59,11 @@ public class TcpLogForwarderTest {
     public void plugin_enabled_for_pipeline() throws IOException {
 
         doReturn(this.config).when(this.testSubject).getConfig();
+        doReturn(this.socket).when(this.testSubject).getSocket(HOST, Integer.parseInt(PORT));
+
         when(this.config.isEnabled()).thenReturn(true);
-        when(this.config.getSocket()).thenReturn(this.socket);
+        when(this.config.getHost()).thenReturn(HOST);
+        when(this.config.getPort()).thenReturn(PORT);
         when(this.socket.getOutputStream()).thenReturn(this.socketOutputStream);
 
         final OutputStream result = this.testSubject.decorateLogger(this.build, this.logger);
@@ -71,10 +74,12 @@ public class TcpLogForwarderTest {
     public void plugin_enabled_for_freestyle() throws IOException {
 
         doReturn(this.config).when(this.freestyleTestSubject).getConfig();
-        when(this.config.isEnabled()).thenReturn(true);
-        when(this.config.getSocket()).thenReturn(this.socket);
-        when(this.socket.getOutputStream()).thenReturn(this.socketOutputStream);
+        doReturn(this.socket).when(this.freestyleTestSubject).getSocket(HOST, Integer.parseInt(PORT));
 
+        when(this.config.isEnabled()).thenReturn(true);
+        when(this.config.getHost()).thenReturn(HOST);
+        when(this.config.getPort()).thenReturn(PORT);
+        when(this.socket.getOutputStream()).thenReturn(this.socketOutputStream);
         when(this.build.getFullDisplayName()).thenReturn(FULL_DISPLAY_NAME);
 
         final OutputStream result = this.freestyleTestSubject.decorateLogger(this.build, this.logger);

@@ -1,12 +1,12 @@
 package org.jenkinsci.plugins.tcplogforwarder;
 
+import com.google.common.annotations.VisibleForTesting;
 import hudson.Extension;
 import hudson.console.ConsoleLogFilter;
 import hudson.model.Run;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.Serializable;
+import java.io.*;
+import java.net.Socket;
 
 /**
  * This class is only annotated as an Extension to support non-pipeline builds.  It is
@@ -45,11 +45,22 @@ public class TcpLogForwarder extends ConsoleLogFilter implements Serializable {
             return logger;
         }
 
-        return new ForwarderFilterOutputStream(logger, this.getJobDescription(build));
+        final String host = config.getHost();
+        final int port = Integer.parseInt(config.getPort());
+        final Socket socket = getSocket(host, port);
+
+        final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+        return new ForwarderFilterOutputStream(writer, logger, this.getJobDescription(build));
     }
 
+    @VisibleForTesting
     TcpLogForwarderConfiguration getConfig() {
         return TcpLogForwarderConfiguration.get();
+    }
+
+    @VisibleForTesting
+    Socket getSocket(final String host, final int port) throws IOException {
+        return new Socket(host, port);
     }
 
     // Horrible, but can support non-pipeline builds this way
@@ -61,5 +72,4 @@ public class TcpLogForwarder extends ConsoleLogFilter implements Serializable {
         }
         return this.jobDescription;
     }
-
 }

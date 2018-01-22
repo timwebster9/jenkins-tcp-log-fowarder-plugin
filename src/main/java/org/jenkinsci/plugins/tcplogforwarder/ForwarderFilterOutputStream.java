@@ -3,32 +3,20 @@ package org.jenkinsci.plugins.tcplogforwarder;
 import hudson.console.ConsoleNote;
 import hudson.util.ByteArrayOutputStream2;
 
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.FilterOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 
 public class ForwarderFilterOutputStream extends FilterOutputStream {
 
     private static final int LF = 0x0A;
 
+    private BufferedWriter writer;
     private ByteArrayOutputStream2 rawOutputStream = new ByteArrayOutputStream2(512);
     private ByteArrayOutputStream2 textOutputStream = new ByteArrayOutputStream2(512);
     private String fullDisplayName;
 
-    /**
-     * Writes the console log to both the original logger OutputStream as well as the remote TCP socket.
-     *
-     * @param logger
-     *      the original console logger OutputStream
-     * @param fullDisplayName
-     *      the Job name/number.  Included in the TCP log for easy grepping.
-     *
-     * @throws IOException
-     */
-    public ForwarderFilterOutputStream(OutputStream logger, String fullDisplayName) {
+    public ForwarderFilterOutputStream(final BufferedWriter writer, OutputStream logger, String fullDisplayName) {
         super(logger);
+        this.writer = writer;
         this.fullDisplayName = fullDisplayName;
     }
 
@@ -44,6 +32,7 @@ public class ForwarderFilterOutputStream extends FilterOutputStream {
     @Override
     public void flush() throws IOException {
         super.flush();
+        this.writer.flush();
         this.rawOutputStream.flush();
         this.textOutputStream.flush();
     }
@@ -53,6 +42,7 @@ public class ForwarderFilterOutputStream extends FilterOutputStream {
         super.close();
         this.rawOutputStream.close();
         this.textOutputStream.close();
+        this.writer.close(); // closes socket as well
     }
 
     private void writeLine() throws IOException {
@@ -63,7 +53,9 @@ public class ForwarderFilterOutputStream extends FilterOutputStream {
         decodeConsoleBase64Text(this.rawOutputStream.getBuffer(), this.rawOutputStream.size(), this.textOutputStream);
 
         // Send the log
-        SocketWriter.write(textOutputStream.toString());
+        this.writer.write(textOutputStream.toString());
+        this.writer.flush();
+        //SocketWriter.write(textOutputStream.toString());
 
         // re-use
         this.rawOutputStream.reset();
