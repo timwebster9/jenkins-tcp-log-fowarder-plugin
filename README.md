@@ -1,6 +1,15 @@
 # Jenkins TCP Log Forwarder Plugin
 
-Streams Jenkins **console** logs to a remote TCP endpoint.
+Generic plugin that streams Jenkins **console** logs to a remote TCP endpoint.
+
+Each line of the log will be prefixed with the job name and number, for example:
+
+    my-java-job #2 - [scripted-java-job] Running shell script
+    my-java-job #2 - + docker inspect -f . maven:3-alpine
+    my-java-job #2 - .
+    my-java-job #2 - 501919691f33-114b94e7 seems to be running inside container 501919691f33f0ca086c64f080ba0b62180a667231a69869d282b54768972263
+    my-java-job #2 - [scripted-java-job] Running shell script
+    my-java-job #2 - + mvn -B clean package
 
 ## Usage
 
