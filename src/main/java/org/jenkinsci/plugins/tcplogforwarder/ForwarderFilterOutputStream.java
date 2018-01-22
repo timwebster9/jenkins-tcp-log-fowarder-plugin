@@ -46,10 +46,8 @@ public class ForwarderFilterOutputStream extends FilterOutputStream {
     }
 
     private void writeLine() throws IOException {
-        final StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(this.fullDisplayName).append(" - ");
-
-        this.textOutputStream.write(stringBuilder.toString().getBytes());
+        final String prefix = this.fullDisplayName + " - ";
+        this.textOutputStream.write(prefix.getBytes());
         decodeConsoleBase64Text(this.rawOutputStream.getBuffer(), this.rawOutputStream.size(), this.textOutputStream);
 
         // Send the log
