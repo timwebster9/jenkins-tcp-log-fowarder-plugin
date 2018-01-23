@@ -43,7 +43,7 @@
 
     <scm>
         <connection>scm:git:git@github.com:timwebster9/jenkins-tcp-log-fowarder-plugin.git</connection>
-        <developerConnection>git@github.com:timwebster9/jenkins-tcp-log-fowarder-plugin.git</developerConnection>
+        <developerConnection>scm:git:git@github.com:timwebster9/jenkins-tcp-log-fowarder-plugin.git</developerConnection>
         <url>https://github.com/timwebster9/jenkins-tcp-log-fowarder-plugin</url>
     </scm>
 
