@@ -7,6 +7,7 @@ import hudson.model.Run;
 
 import java.io.*;
 import java.net.Socket;
+import java.nio.charset.Charset;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -52,7 +53,7 @@ public class TcpLogForwarder extends ConsoleLogFilter implements Serializable {
 
         try {
             final Socket socket = getSocket(host, port);
-            final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+            final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), Charset.forName("UTF-8")));
             return new ForwarderFilterOutputStream(writer, logger, this.getJobDescription(build));
         }
         catch (final IOException e) {

@@ -4,6 +4,7 @@ import hudson.console.ConsoleNote;
 import hudson.util.ByteArrayOutputStream2;
 
 import java.io.*;
+import java.nio.charset.Charset;
 
 public class ForwarderFilterOutputStream extends FilterOutputStream {
 
@@ -47,7 +48,7 @@ public class ForwarderFilterOutputStream extends FilterOutputStream {
 
     private void writeLine() throws IOException {
         final String prefix = this.fullDisplayName + " - ";
-        this.textOutputStream.write(prefix.getBytes());
+        this.textOutputStream.write(prefix.getBytes(Charset.forName("UTF-8")));
         decodeConsoleBase64Text(this.rawOutputStream.getBuffer(), this.rawOutputStream.size(), this.textOutputStream);
 
         // Send the log
