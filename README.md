@@ -1,3 +1,6 @@
+[![CircleCI](https://circleci.com/gh/timwebster9/jenkins-tcp-log-fowarder-plugin.svg?style=shield)](https://circleci.com/gh/timwebster9/jenkins-tcp-log-fowarder-plugin)
+---
+
 # Jenkins TCP Log Forwarder Plugin
 
 ##### Generic plugin that streams Jenkins _console_ logs to a remote TCP endpoint.
@@ -76,6 +79,3 @@ To start a local Jenkins instance with the plugin installed:
     mvn hpi:run
 
 Jenkins can then be reached at http://localhost:8080/jenkins/
-
-## CI
-[![CircleCI](https://circleci.com/gh/timwebster9/jenkins-tcp-log-fowarder-plugin.svg?style=shield)](https://circleci.com/gh/timwebster9/jenkins-tcp-log-fowarder-plugin)
