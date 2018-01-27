@@ -31,6 +31,8 @@ jobs:
             - ~/.m2
           key: v1-dependencies-{{ checksum "pom.xml" }}
 
-      # run tests!
-      - run: mvn package
+      - run: mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent package sonar:sonar \
+                 -Dsonar.host.url=https://sonarcloud.io \
+                 -Dsonar.organization=timwebster9-github \
+                 -Dsonar.login=ba995dc0480429bd9d6a601e15a43bf95b1521b9
 
