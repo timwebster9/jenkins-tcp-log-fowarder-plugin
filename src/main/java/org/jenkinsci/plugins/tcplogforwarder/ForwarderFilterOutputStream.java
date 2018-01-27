@@ -10,6 +10,7 @@ import java.io.DataInputStream;
 import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 
 public class ForwarderFilterOutputStream extends FilterOutputStream {
 
@@ -90,7 +91,7 @@ public class ForwarderFilterOutputStream extends FilterOutputStream {
     }
 
     private void writeLine() throws IOException {
-        this.textOutputStream.write(this.getPrefix().getBytes());
+        this.textOutputStream.write(this.getPrefix().getBytes(Charset.forName("UTF-8")));
         decodeConsoleBase64Text(this.rawOutputStream.getBuffer(), this.rawOutputStream.size(), this.textOutputStream);
 
         // Send the log
