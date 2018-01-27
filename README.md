@@ -78,4 +78,4 @@ To start a local Jenkins instance with the plugin installed:
 Jenkins can then be reached at http://localhost:8080/jenkins/
 
 ## CI
-[![CircleCI](https://circleci.com/gh/timwebster9/jenkins-tcp-log-fowarder-plugin.svg?style=svg)](https://circleci.com/gh/timwebster9/jenkins-tcp-log-fowarder-plugin)
+[![CircleCI](https://circleci.com/gh/timwebster9/jenkins-tcp-log-fowarder-plugin.svg?style=shield)](https://circleci.com/gh/timwebster9/jenkins-tcp-log-fowarder-plugin)
