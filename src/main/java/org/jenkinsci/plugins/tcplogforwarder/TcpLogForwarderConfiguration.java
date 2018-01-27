@@ -8,10 +8,6 @@ import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.net.Socket;
-
 @Extension
 public class TcpLogForwarderConfiguration extends GlobalConfiguration {
 
@@ -100,10 +96,8 @@ public class TcpLogForwarderConfiguration extends GlobalConfiguration {
     }
 
     public FormValidation doCheckMaxMessageSize(@QueryParameter String value) {
-        if (StringUtils.isNotEmpty(value)) {
-            if (isNotLong(value)) {
-                return FormValidation.warning("Please specify a long value.");
-            }
+        if (StringUtils.isNotEmpty(value) && isNotLong(value)) {
+            return FormValidation.warning("Please specify a long value.");
         }
         return FormValidation.ok();
     }

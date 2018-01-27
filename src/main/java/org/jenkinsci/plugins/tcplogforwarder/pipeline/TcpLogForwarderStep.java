@@ -21,7 +21,9 @@ import java.util.Set;
 public class TcpLogForwarderStep extends Step {
 
     @DataBoundConstructor
-    public TcpLogForwarderStep() {}
+    public TcpLogForwarderStep() {
+        // required
+    }
 
     @Override
     public StepExecution start(StepContext stepContext) throws Exception {

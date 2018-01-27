@@ -75,10 +75,8 @@ public class TcpLogForwarder extends ConsoleLogFilter implements Serializable {
 
     // Horrible, but can support non-pipeline builds this way
     private String getJobDescription(Run build) {
-        if (this.jobDescription == null) {
-            if (build != null) {
-                return build.getFullDisplayName();
-            }
+        if (this.jobDescription == null && build != null) {
+            return build.getFullDisplayName();
         }
         return this.jobDescription;
     }

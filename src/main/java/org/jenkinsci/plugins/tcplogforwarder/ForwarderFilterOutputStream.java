@@ -11,8 +11,12 @@ import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-public class ForwarderFilterOutputStream extends FilterOutputStream {
+public class ForwarderFilterOutputStream extends FilterOutputStream {  // NOSONAR
+
+    private static final Logger LOG = Logger.getLogger(ForwarderFilterOutputStream.class.getName());
 
     static final int LF = 0x0A;
     static final String SEPARATOR = " - ";
@@ -128,8 +132,8 @@ public class ForwarderFilterOutputStream extends FilterOutputStream {
 
             try {
                 ConsoleNote.skip(new DataInputStream(b));
-            } catch (IOException ex) {
-                //Logger.getLogger(LogEventHelper.class.getName()).log(Level.SEVERE, "failed to filter blob", ex);
+            } catch (IOException e) {
+                LOG.log(Level.SEVERE, "failed to filter blob", e);
             }
 
             int bytesUsed = rest - b.available(); // bytes consumed by annotations
