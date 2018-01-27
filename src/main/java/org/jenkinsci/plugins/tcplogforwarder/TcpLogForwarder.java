@@ -53,7 +53,7 @@ public class TcpLogForwarder extends ConsoleLogFilter implements Serializable {
         try {
             final Socket socket = getSocket(host, port);
             final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-            return new ForwarderFilterOutputStream(writer, logger, this.getJobDescription(build));
+            return new ForwarderFilterOutputStream(writer, logger, this.getJobDescription(build), config.getMaxMessageValue());
         }
         catch (final IOException e) {
             LOG.log(Level.SEVERE, "Error!: " + e.getMessage());

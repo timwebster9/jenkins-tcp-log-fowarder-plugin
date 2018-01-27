@@ -11,5 +11,8 @@
         <f:entry field="port" title="${%Port}">
             <f:textbox/>
         </f:entry>
+        <f:entry field="maxMessageSize" title="${%Maximum Message Size}">
+            <f:textbox/>
+        </f:entry>
     </f:section>
 </j:jelly>

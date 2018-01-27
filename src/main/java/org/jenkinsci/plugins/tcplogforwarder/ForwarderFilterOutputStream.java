@@ -1,32 +1,76 @@
 package org.jenkinsci.plugins.tcplogforwarder;
 
+import com.google.common.annotations.VisibleForTesting;
 import hudson.console.ConsoleNote;
 import hudson.util.ByteArrayOutputStream2;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+import java.io.FilterOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 
 public class ForwarderFilterOutputStream extends FilterOutputStream {
 
-    private static final int LF = 0x0A;
+    static final int LF = 0x0A;
+    static final String SEPARATOR = " - ";
 
     private BufferedWriter writer;
     private ByteArrayOutputStream2 rawOutputStream = new ByteArrayOutputStream2(512);
     private ByteArrayOutputStream2 textOutputStream = new ByteArrayOutputStream2(512);
     private String fullDisplayName;
+    private long maxMessageSize;
 
-    public ForwarderFilterOutputStream(final BufferedWriter writer, OutputStream logger, String fullDisplayName) {
+    public ForwarderFilterOutputStream(final BufferedWriter writer, final OutputStream logger,
+                                       final String fullDisplayName, final long maxMessageSize) {
         super(logger);
         this.writer = writer;
         this.fullDisplayName = fullDisplayName;
+        this.maxMessageSize = maxMessageSize;
     }
 
     @Override
     public void write(int i) throws IOException {
         super.write(i);
-        this.rawOutputStream.write(i);
-        if (i == LF) {
+
+        if (this.isFull()) {
+
+            // add newline and flush the message
+            this.rawOutputStream.write(LF);
             writeLine();
+
+            // carry on with the now-reset buffer
+            this.rawOutputStream.write(i);
         }
+        else {
+            this.rawOutputStream.write(i);
+            if (i == LF) {
+                writeLine();
+            }
+        }
+    }
+
+    private boolean isFull() {
+
+        if (this.maxMessageSize == TcpLogForwarderConfiguration.UNLIMITED_MESSAGE_SIZE) {
+            return false;
+        }
+
+        final long maxBufferSize = this.getMaxBufferSize();
+
+        if (maxBufferSize < 1) {
+            throw new TcpLogforwarderException("Calculated message size is less than 1.  Is your 'Maximum Message Size' set too low?");
+        }
+
+        return (this.rawOutputStream.size() == maxBufferSize);
+    }
+
+    @VisibleForTesting
+    private long getMaxBufferSize() {
+        // The prefix counts towards the max message length
+        // Also subtract 1 for the newline
+        return this.maxMessageSize - this.getPrefix().length() - 1;
     }
 
     @Override
@@ -46,18 +90,20 @@ public class ForwarderFilterOutputStream extends FilterOutputStream {
     }
 
     private void writeLine() throws IOException {
-        final String prefix = this.fullDisplayName + " - ";
-        this.textOutputStream.write(prefix.getBytes());
+        this.textOutputStream.write(this.getPrefix().getBytes());
         decodeConsoleBase64Text(this.rawOutputStream.getBuffer(), this.rawOutputStream.size(), this.textOutputStream);
 
         // Send the log
         this.writer.write(textOutputStream.toString());
         this.writer.flush();
-        //SocketWriter.write(textOutputStream.toString());
 
         // re-use
         this.rawOutputStream.reset();
         this.textOutputStream.reset();
+    }
+
+    private String getPrefix() {
+        return this.fullDisplayName + SEPARATOR;
     }
 
     /**

@@ -1,5 +1,6 @@
 package org.jenkinsci.plugins.tcplogforwarder;
 
+import com.google.common.annotations.VisibleForTesting;
 import hudson.Extension;
 import hudson.util.FormValidation;
 import jenkins.model.GlobalConfiguration;
@@ -14,17 +15,25 @@ import java.net.Socket;
 @Extension
 public class TcpLogForwarderConfiguration extends GlobalConfiguration {
 
+    static final long UNLIMITED_MESSAGE_SIZE = -1L;
+
     public static TcpLogForwarderConfiguration get() {
         return GlobalConfiguration.all().get(TcpLogForwarderConfiguration.class);
     }
 
+    // Form values
     private String host;
     private String port;
+    private String maxMessageSize;
+
     private boolean enabled;
 
     public TcpLogForwarderConfiguration() {
         load();
     }
+
+    @VisibleForTesting
+    public TcpLogForwarderConfiguration(final boolean test) {}
 
     public boolean isEnabled() {
         return enabled;
@@ -56,6 +65,23 @@ public class TcpLogForwarderConfiguration extends GlobalConfiguration {
         save();
     }
 
+    public String getMaxMessageSize() {
+        return maxMessageSize;
+    }
+
+    @DataBoundSetter
+    public void setMaxMessageSize(String maxMessageSize) {
+        this.maxMessageSize = maxMessageSize;
+        save();
+    }
+
+    public long getMaxMessageValue() {
+        if (StringUtils.isNotEmpty(this.maxMessageSize)) {
+            return Long.parseLong(this.maxMessageSize);
+        }
+        return UNLIMITED_MESSAGE_SIZE;
+    }
+
     public FormValidation doCheckHost(@QueryParameter String value) {
         if (StringUtils.isEmpty(value)) {
             return FormValidation.warning("Please specify a host.");
@@ -71,6 +97,24 @@ public class TcpLogForwarderConfiguration extends GlobalConfiguration {
             return FormValidation.warning("Please specify an integer.");
         }
         return FormValidation.ok();
+    }
+
+    public FormValidation doCheckMaxMessageSize(@QueryParameter String value) {
+        if (StringUtils.isNotEmpty(value)) {
+            if (isNotInteger(value)) {
+                return FormValidation.warning("Please specify a long value.");
+            }
+        }
+        return FormValidation.ok();
+    }
+
+    private static boolean isNotLong(final String value) {
+        try {
+            Long.parseLong(value);
+            return false;
+        } catch (NumberFormatException e) {
+            return true;
+        }
     }
 
     private static boolean isNotInteger(final String value) {
