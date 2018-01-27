@@ -1,4 +1,4 @@
-[![CircleCI](https://circleci.com/gh/timwebster9/jenkins-tcp-log-fowarder-plugin.svg?style=shield)](https://circleci.com/gh/timwebster9/jenkins-tcp-log-fowarder-plugin)
+[![Build Status](https://travis-ci.org/timwebster9/jenkins-tcp-log-fowarder-plugin.svg?branch=master)](https://travis-ci.org/timwebster9/jenkins-tcp-log-fowarder-plugin)
 ---
 
 # Jenkins TCP Log Forwarder Plugin
