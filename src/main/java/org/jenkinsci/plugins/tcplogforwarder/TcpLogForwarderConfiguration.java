@@ -101,7 +101,7 @@ public class TcpLogForwarderConfiguration extends GlobalConfiguration {
 
     public FormValidation doCheckMaxMessageSize(@QueryParameter String value) {
         if (StringUtils.isNotEmpty(value)) {
-            if (isNotInteger(value)) {
+            if (isNotLong(value)) {
                 return FormValidation.warning("Please specify a long value.");
             }
         }
