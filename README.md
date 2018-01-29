@@ -21,7 +21,7 @@ Each line of the log will be prefixed with the job name and number, for example:
 * Go to Manage Jenkins -> Configure System
 * Scroll down to 'Tcp Log Forwarder Plugin'
 * Tick 'Enable'
-* Fill in the fields for host and port
+* Fill in the fields for host, port and any other option
 
 ### Freestyle Projects
 
@@ -79,3 +79,15 @@ To start a local Jenkins instance with the plugin installed:
     mvn hpi:run
 
 Jenkins can then be reached at http://localhost:8080/jenkins/
+
+### Releasing
+Stick to semantic versioning tags (e.g. 1.0, 1.1, etc) instead of the Maven default which includes project name:
+
+To perform a 'dry run' first:
+
+    mvn -B -Dtag=<TAG> release:prepare release:perform -DdryRun=true
+
+For an actual release (for version 1.1 for example):
+
+    mvn -B -Dtag=1.1 release:prepare release:perform
+
